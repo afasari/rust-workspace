@@ -113,11 +113,11 @@ jobs:
 
     - name: Build and run
       env:
-        PORT: 80
+        PORT: 8080  # Changed from 80 to 8080
         DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
       run: |
         cargo build --release
-        cargo run --release
+        sudo cargo run --release  # Added sudo to handle port binding
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
