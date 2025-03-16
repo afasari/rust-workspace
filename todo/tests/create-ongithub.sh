@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Replace with your GitHub Pages URL
-BASE_URL="http://localhost:8081"
+BASE_URL="https://afasari.github.io/rust-workspace"
 
 # Create a new task
 echo "Creating new task..."

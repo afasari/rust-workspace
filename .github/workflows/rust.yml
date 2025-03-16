@@ -66,39 +66,39 @@ jobs:
         cargo test --lib
         cargo test --test integration_tests
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    defaults:
-      run:
-        working-directory: ./todo
+  # deploy:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   defaults:
+  #     run:
+  #       working-directory: ./todo
 
-    steps:
-    - uses: actions/checkout@v3
+  #   steps:
+  #   - uses: actions/checkout@v3
 
-    - name: Build and run
-      env:
-        PORT: 80  # Standard HTTP port
-      run: cargo run --release
+  #   - name: Build and run
+  #     env:
+  #       PORT: 80  # Standard HTTP port
+  #     run: cargo run --release
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./todo/target/release
+  #   - name: Deploy to GitHub Pages
+  #     uses: peaceiris/actions-gh-pages@v3
+  #     with:
+  #       github_token: ${{ secrets.GITHUB_TOKEN }}
+  #       publish_dir: ./todo/target/release
 
-    - name: Wait for GitHub Pages
-      run: |
-        sleep 60  # Wait for GitHub Pages to deploy
+  #   - name: Wait for GitHub Pages
+  #     run: |
+  #       sleep 60  # Wait for GitHub Pages to deploy
 
-    - name: Verify deployment
-      run: |
-        DEPLOY_URL="https://${{ github.repository_owner }}.github.io/rust-workspace"
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $DEPLOY_URL)
-        if [ $HTTP_STATUS -eq 200 ]; then
-          echo "✅ Deployment successful! Site is accessible at $DEPLOY_URL"
-        else
-          echo "❌ Deployment verification failed. Status code: $HTTP_STATUS"
-          exit 1
-        fi
+  #   - name: Verify deployment
+  #     run: |
+  #       DEPLOY_URL="https://${{ github.repository_owner }}.github.io/rust-workspace"
+  #       HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $DEPLOY_URL)
+  #       if [ $HTTP_STATUS -eq 200 ]; then
+  #         echo "✅ Deployment successful! Site is accessible at $DEPLOY_URL"
+  #       else
+  #         echo "❌ Deployment verification failed. Status code: $HTTP_STATUS"
+  #         exit 1
+  #       fi
