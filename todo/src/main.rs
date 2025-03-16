@@ -30,11 +30,13 @@ async fn main() {
         .route("/tasks/{id}", delete(handlers::delete_task))
         .with_state(db_connection.clone());
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8081").await.unwrap();
+    let port = env::var("PORT").unwrap_or_else(|_| "8081".to_string());
+    let addr = format!("0.0.0.0:{}", port);
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     let server = axum::serve(listener, app).with_graceful_shutdown(shutdown_signal());
 
     tokio::spawn(async move {
-        println!("Server is running");
+        println!("Server is running on {}", addr);
     });
 
     if let Err(e) = server.await {
