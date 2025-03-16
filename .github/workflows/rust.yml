@@ -37,6 +37,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -79,80 +82,3 @@ jobs:
       run: |
         cargo test --lib
         cargo test --test integration_tests
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    defaults:
-      run:
-        working-directory: ./todo
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libpq-dev postgresql-client
-
-    - name: Wait for PostgreSQL
-      run: |
-        while ! pg_isready -h localhost -p 5432; do
-          echo "Waiting for PostgreSQL to start..."
-          sleep 1
-        done
-
-    - name: Run migrations
-      env:
-        DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
-      run: |
-        cargo install diesel_cli --no-default-features --features postgres
-        diesel migration run
-
-    - name: Build and Run
-      env:
-        PORT: 8080
-        DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
-      run: |
-        cargo build --release
-        sudo -E env "PATH=$PATH" cargo run --release
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./todo/target/release
-
-    - name: Wait for GitHub Pages
-      run: |
-        sleep 60  # Wait for GitHub Pages to deploy
-
-    - name: Verify deployment
-      run: |
-        DEPLOY_URL="https://${{ github.repository_owner }}.github.io/rust-workspace"
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $DEPLOY_URL)
-        if [ $HTTP_STATUS -eq 200 ]; then
-          echo "✅ Deployment successful! Site is accessible at $DEPLOY_URL"
-        else
-          echo "❌ Deployment verification failed. Status code: $HTTP_STATUS"
-          exit 1
-        fi
