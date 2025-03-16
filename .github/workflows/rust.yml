@@ -16,6 +16,9 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./todo
 
     services:
       postgres:
@@ -50,8 +53,8 @@ jobs:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
-          target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          todo/target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('todo/Cargo.lock') }}
 
     - name: Run migrations
       run: |
@@ -67,6 +70,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    defaults:
+      run:
+        working-directory: ./todo
 
     steps:
     - uses: actions/checkout@v3
@@ -78,4 +84,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./target/release
+        publish_dir: ./todo/target/release
