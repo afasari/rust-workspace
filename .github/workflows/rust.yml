@@ -106,18 +106,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libpq-dev postgresql-client
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
 
     - name: Build and run
       env:
-        PORT: 8080  # Changed from 80 to 8080
+        PORT: 8080
         DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
       run: |
         cargo build --release
-        sudo cargo run --release  # Added sudo to handle port binding
+        sudo -E cargo run --release  # Added -E to preserve environment variables
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
