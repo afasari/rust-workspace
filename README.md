@@ -50,3 +50,36 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - GitHub: @afasari
 ⭐ Don't forget to star this repository if you find it helpful!
+
+## 🗺️ Roadmap
+
+### Workspace Level
+
+- [ ] Add more Rust projects
+  - [ ] CLI tools
+  - [ ] Web servers
+  - [ ] System utilities
+- [ ] Implement shared libraries
+- [ ] Add benchmarking suite
+- [ ] Add workspace-wide documentation
+- [ ] Set up cross-platform CI/CD
+- [ ] Add performance monitoring
+- [ ] Create development guidelines
+
+### Current Projects
+
+#### Todo API Roadmap
+
+- [ ] Add user authentication
+- [ ] Implement rate limiting
+- [ ] Add task categories
+- [ ] Implement task priorities
+- [ ] Add due dates
+- [ ] Create API documentation
+- [ ] Add metrics monitoring
+- [ ] Implement caching
+- [ ] Add WebSocket support
+- [ ] Create frontend application
+  - [ ] React.js implementation
+  - [ ] Mobile responsive design
+  - [ ] Real-time updates
