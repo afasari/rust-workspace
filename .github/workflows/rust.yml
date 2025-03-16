@@ -88,13 +88,36 @@ jobs:
       run:
         working-directory: ./todo
 
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev postgresql-client
+
     - name: Build and run
       env:
-        PORT: 80  # Standard HTTP port
-      run: cargo run --release
+        PORT: 80
+        DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
+      run: |
+        cargo build --release
+        cargo run --release
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
